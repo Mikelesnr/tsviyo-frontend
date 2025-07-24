@@ -16,7 +16,7 @@ export default function RideHailingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} setPage={setPage} />
+      <Header user={user} setUser={setUser} setPage={setPage} />
       <main className="container mx-auto px-4 py-8">
         {page === "home" && <HomeView setPage={setPage} />}
         {page === "signup" && <SignUp setUser={setUser} setPage={setPage} />}
