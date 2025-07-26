@@ -41,6 +41,7 @@ export default function Login({ setUser, setPage }: LoginProps) {
       );
 
       const data = await response.json();
+      
       if (!response.ok) {
         throw new Error(data.message || "Login failed. Please check your credentials.");
       }

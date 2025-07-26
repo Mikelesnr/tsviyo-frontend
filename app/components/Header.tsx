@@ -11,7 +11,6 @@ export default function Header({ user, setUser, setPage }: HeaderProps) {
 
   const handleLogoClick = () => {
     setPage("home");
-    window.location.reload();
   };
 
   const handleLogout = async () => {
@@ -34,7 +33,6 @@ export default function Header({ user, setUser, setPage }: HeaderProps) {
     setUser(null);
 
     setPage("home");
-    window.location.reload();
   };
 
   return (

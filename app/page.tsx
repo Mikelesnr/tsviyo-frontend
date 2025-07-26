@@ -8,7 +8,7 @@ import RideRequest from "./components/RideRequest";
 import TrackingView from "./components/TrackingView";
 import FareView from "./components/FareView";
 import RatingView from "./components/RatingView";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function RideHailingPage() {
   const [user, setUser] = useState<any>(null);
@@ -17,8 +17,10 @@ export default function RideHailingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header user={user} setUser={setUser} setPage={setPage} />
+
       <main className="container mx-auto px-4 py-8">
-        {page === "home" && <HomeView setPage={setPage} />}
+        {page === "home" && <HomeView user={user} setPage={setPage} />}
+
         {page === "signup" && <SignUp setUser={setUser} setPage={setPage} />}
         {page === "login" && <Login setUser={setUser} setPage={setPage} />}
         {page === "driver-onboarding" && <DriverOnboarding user={user} />}
