@@ -76,7 +76,6 @@ export default function SignUp({ setUser, setPage }: SignUpProps) {
       });
 
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || "Registration failed. Please try again.");
       }
@@ -88,13 +87,20 @@ export default function SignUp({ setUser, setPage }: SignUpProps) {
         phone: data.user?.phone,
         role: data.user?.role || formData.role,
         token: data.token,
+        email_verified_at: data.user?.email_verified_at || null,
       };
 
       setUser(newUser);
-      if (newUser.role === "driver") {
-        setPage("driver-onboarding");
+      if (newUser.email_verified_at) {
+        
+        if (newUser.role === "driver") {
+          setPage("driver-onboarding");
+        } else {
+          setPage("ride-request");
+        }
       } else {
-        setPage("ride-request");
+        
+        setPage("verify-email");
       }
     } catch (err: any) {
       setError(err.message);

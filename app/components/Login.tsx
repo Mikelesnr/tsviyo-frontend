@@ -41,21 +41,20 @@ export default function Login({ setUser, setPage }: LoginProps) {
       );
 
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || "Login failed. Please check your credentials.");
       }
 
       const { user: userData, access_token: token, token_type } = data;
 
-      // For now, assume role is in userData or default to 'driver'
-      const role = userData.role || "driver";
+      const role = userData.role;
 
       const newUser = {
         id: userData.id,
         name: userData.name,
+        email_verified_at: userData.email_verified_at,
         email: formData.email,
-        role, 
+        role,
         token: `${token_type} ${token}`,
       };
 
@@ -63,10 +62,14 @@ export default function Login({ setUser, setPage }: LoginProps) {
       setUser(newUser);
 
       // Redirect based on role
-      if (newUser.role === "driver") {
-        setPage("driver-onboarding");
+      if (newUser.email_verified_at) {
+        if (newUser.role === "driver") {
+          setPage("driver-onboarding");
+        } else {
+          setPage("ride-request");
+        }
       } else {
-        setPage("ride-request");
+        setPage("verify-email");
       }
     } catch (err: any) {
       setError(err.message || "Login failed. Please try again.");
