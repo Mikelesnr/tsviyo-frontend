@@ -15,24 +15,9 @@ export default function RideHailingPage() {
   const [user, setUser] = useState<any>(null);
   const [page, setPage] = useState<string>("home");
 
-  // If user exists but email is not verified, show verification prompt
-  if (user && user.email_verified_at === null) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center p-6 bg-white rounded-lg shadow-md max-w-md">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Email Verification Required</h2>
-          <p className="text-gray-600 mb-6">
-            We sent a verification link to <strong>{user.email}</strong>. Please check your inbox.
-          </p>
-          <button
-            onClick={() => setPage("verify-email")}
-            className="text-blue-600 hover:underline font-medium"
-          >
-            Go to Verification Page
-          </button>
-        </div>
-      </div>
-    );
+  // If user exists but email is not verified, set page to verify-email
+  if (user && user.email_verified_at === null && page !== "verify-email") {
+    setPage("verify-email");
   }
 
   return (

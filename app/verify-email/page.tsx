@@ -1,3 +1,4 @@
+'use client';
 import { useRouter } from "next/navigation";
 
 type User = {
@@ -6,6 +7,7 @@ type User = {
   email: string;
   email_verified_at: string | null;
   token: string;
+  role: string;
 };
 
 type VerifyEmailPageProps = {
@@ -32,8 +34,14 @@ export default function ResendVerificationPage({ user, setUser, setPage }: Verif
           Your email has already been verified. You can now request rides or drive.
         </p>
         <button
-          onClick={() => setPage("ride-request")}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          onClick={() => {
+            if (user.role === "driver") {
+              setPage("driver-onboarding");
+            } else {
+              setPage("ride-request");
+            }
+          }}
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
         >
           Continue to App
         </button>
@@ -81,14 +89,6 @@ export default function ResendVerificationPage({ user, setUser, setPage }: Verif
         className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition mb-4"
       >
         Resend Verification Email
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setPage("home")}
-        className="w-full text-gray-600 hover:underline"
-      >
-        Back to Home
       </button>
     </div>
   );
