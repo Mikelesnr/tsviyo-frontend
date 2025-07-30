@@ -33,7 +33,7 @@ export default function RideHailingPage() {
         {page === "signup" && <SignUp setUser={setUser} setPage={setPage} />}
         {page === "login" && <Login setUser={setUser} setPage={setPage} />}
         {page === "verify-email" && <ResendVerificationPage user={user} setUser={setUser} setPage={setPage} />}
-        {page === "driver-onboarding" && <DriverOnboarding user={user} />}
+        {page === "driver-onboarding" && <DriverOnboarding user={user} setPage={setPage} />}
         {page === "ride-request" && <RideRequest user={user} setPage={setPage} />}
         {page === "tracking" && <TrackingView user={user} setPage={setPage} />}
         {page === "fare" && <FareView user={user} setPage={setPage} />}
