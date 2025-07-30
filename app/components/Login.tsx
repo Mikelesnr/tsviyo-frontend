@@ -1,4 +1,6 @@
+'use client';
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type LoginProps = {
   setUser: (user: any) => void;
@@ -6,6 +8,7 @@ type LoginProps = {
 };
 
 export default function Login({ setUser, setPage }: LoginProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,6 +20,34 @@ export default function Login({ setUser, setPage }: LoginProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError(null);
+  };
+
+  // ✅ Function to create rider profile
+  const createRiderProfile = async (token: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rider`, {
+        method: "POST",
+        headers: {
+          "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
+          Accept: process.env.NEXT_PUBLIC_ACCEPT!,
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          home_address: "Default Home Address",
+          image_url: "https://placehold.co/200x200/cccccc/999999?text=Rider",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Rider profile created:", data);
+      } else {
+        console.warn("Rider profile may already exist or failed:", data.message);
+      }
+    } catch (err) {
+      console.error("Error creating rider profile:", err);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,10 +89,13 @@ export default function Login({ setUser, setPage }: LoginProps) {
         token: `${token_type} ${token}`,
       };
 
-
       setUser(newUser);
 
-      // Redirect based on role
+      if (newUser.role === "rider") {
+        createRiderProfile(newUser.token);
+      }
+
+      // Redirect based on verification status
       if (newUser.email_verified_at) {
         if (newUser.role === "driver") {
           setPage("driver-onboarding");
@@ -129,6 +163,17 @@ export default function Login({ setUser, setPage }: LoginProps) {
             <span className="text-sm text-gray-700">Show password</span>
           </label>
         </div>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Forgot your password?{" "}
+          <button
+            type="button"
+            onClick={() => setPage("forgot-password")}
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Reset it here
+          </button>
+        </p>
 
         {/* Submit Button */}
         <button

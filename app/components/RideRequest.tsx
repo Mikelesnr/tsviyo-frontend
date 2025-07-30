@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { GoogleMap, Marker, DirectionsRenderer, useJsApiLoader } from "@react-google-maps/api";
+import { useRouter } from "next/navigation";
 
 type RideRequestProps = {
   user: any;
@@ -11,16 +12,13 @@ const mapContainerStyle = {
   height: "400px",
 };
 
-// Default center: Lagos, Nigeria
 const defaultCenter = {
   lat: 6.57854,
-  lng: 3.29746,
+  lng: 3.29746, // Lagos, Nigeria
 };
 
-// Rate: $0.10 per 10 meters = $10 per km
-const RATE_PER_KM = 10; // USD
+const RATE_PER_KM = 1; // $1 per km
 
-// Reverse geocode: coordinates → address
 const reverseGeocode = (
   latLng: google.maps.LatLngLiteral,
   callback: (address: string) => void
@@ -35,7 +33,6 @@ const reverseGeocode = (
   });
 };
 
-// Geocode: address → coordinates
 const geocodeAddress = (
   address: string,
   callback: (coords: google.maps.LatLngLiteral | null) => void
@@ -54,18 +51,18 @@ const geocodeAddress = (
 };
 
 export default function RideRequest({ user, setPage }: RideRequestProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     pickup: "",
     dropoff: "",
     pickupTime: new Date().toISOString().slice(0, 16),
   });
-
   const [pickupCoords, setPickupCoords] = useState<google.maps.LatLngLiteral | null>(null);
   const [dropoffCoords, setDropoffCoords] = useState<google.maps.LatLngLiteral | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
-  const [fare, setFare] = useState<number | null>(null); // Estimated fare
+  const [fare, setFare] = useState<number | null>(null);
   const [isMapClicked, setIsMapClicked] = useState<"pickup" | "dropoff" | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const pickupRef = useRef<HTMLInputElement>(null);
   const dropoffRef = useRef<HTMLInputElement>(null);
 
@@ -79,21 +76,66 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pickupCoords || !dropoffCoords) {
-      alert("Please set both pickup and dropoff locations.");
+    if (!pickupCoords || !dropoffCoords || fare === null) {
+      alert("Please set both locations and wait for fare calculation.");
       return;
     }
-    if (fare === null) return;
 
-    alert(`Finding a driver for your ride...\nEstimated Fare: $${fare.toFixed(2)}`);
-    setTimeout(() => {
-      setPage("tracking");
-    }, 1500);
+    setLoading(true);
+
+    try {
+      const rideData = {
+        rider_id: user.id,
+        pickup_lat: pickupCoords.lat,
+        pickup_lng: pickupCoords.lng,
+        dropoff_lat: dropoffCoords.lat,
+        dropoff_lng: dropoffCoords.lng,
+        pickup_address: formData.pickup,
+        dropoff_address: formData.dropoff,
+        fare: fare,
+        pickup_time: formData.pickupTime,
+        status: "requested",
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/rides`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
+            Accept: process.env.NEXT_PUBLIC_ACCEPT!,
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify(rideData),
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to create ride request");
+      }
+
+      const rideId = result.data?.id;
+
+      if (!rideId) {
+        throw new Error("No ride ID returned from server");
+      }
+
+      localStorage.setItem("currentRide", JSON.stringify({
+        id: rideId,
+        ...rideData,
+      }));
+
+      setPage("ride-details");
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Handle Places Autocomplete
   const handlePlaceSelect = (
     inputElement: HTMLInputElement,
     setCoords: (coords: google.maps.LatLngLiteral) => void,
@@ -119,7 +161,6 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
     });
   };
 
-  // Handle map click to fix location
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (!e.latLng || !isMapClicked) return;
 
@@ -140,7 +181,6 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
     }
   };
 
-  // Manual "Set Location" from typed address
   const handleManualLocation = (field: "pickup" | "dropoff") => {
     const address = field === "pickup" ? formData.pickup : formData.dropoff;
     if (!address) {
@@ -155,14 +195,12 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
         } else {
           setDropoffCoords(coords);
         }
-        alert(`${field.charAt(0).toUpperCase() + field.slice(1)} location set manually.`);
       } else {
         alert("Could not find location. Try a more specific address or use the map.");
       }
     });
   };
 
-  // Calculate route and fare
   const calculateRoute = useCallback((origin: google.maps.LatLngLiteral, destination: google.maps.LatLngLiteral) => {
     const directionsService = new google.maps.DirectionsService();
     directionsService.route(
@@ -324,14 +362,15 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
         {/* Request Ride Button with Fare */}
         <button
           type="submit"
-          disabled={!fare}
-          className={`w-full py-2 rounded-md transition flex items-center justify-center gap-2 ${
-            fare
+          disabled={!fare || loading}
+          className={`w-full py-2 rounded-md transition flex items-center justify-center gap-2 ${fare && !loading
               ? "bg-blue-600 hover:bg-blue-700 text-white"
               : "bg-gray-400 cursor-not-allowed text-white"
-          }`}
+            }`}
         >
-          {fare ? (
+          {loading ? (
+            "Sending Request..."
+          ) : fare ? (
             <>
               Request Ride • <span className="font-bold">${fare.toFixed(2)}</span>
             </>
@@ -341,7 +380,6 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
         </button>
       </form>
 
-      {/* Instructions */}
       <p className="text-sm text-gray-500 mt-4 text-center">
         Tip: Click 🗺️ to set location by clicking the map, or ✅ to use typed address.
       </p>

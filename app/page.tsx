@@ -9,6 +9,9 @@ import TrackingView from "./components/TrackingView";
 import FareView from "./components/FareView";
 import RatingView from "./components/RatingView";
 import ResendVerificationPage from "./verify-email/page";
+import ForgotPasswordForm from "./components/ForgotPasswordForm";
+import RideDetails from "./components/RideDetails";
+import PusherClient from "./components/PusherClient";
 import { useState } from "react";
 
 export default function RideHailingPage() {
@@ -22,6 +25,7 @@ export default function RideHailingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PusherClient />
       <Header user={user} setUser={setUser} setPage={setPage} />
 
       <main className="container mx-auto px-4 py-8">
@@ -34,6 +38,8 @@ export default function RideHailingPage() {
         {page === "tracking" && <TrackingView user={user} setPage={setPage} />}
         {page === "fare" && <FareView user={user} setPage={setPage} />}
         {page === "rating" && <RatingView user={user} setPage={setPage} />}
+        {page === "forgot-password" && <ForgotPasswordForm setPage={setPage} />}
+        {page === "ride-details" && <RideDetails setPage={setPage} user={user} />}
       </main>
     </div>
   );

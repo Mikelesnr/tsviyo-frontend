@@ -1,3 +1,5 @@
+import PastRides from "./PastRides";
+
 type HomeViewProps = {
   user: any;
   setPage: (page: string) => void;
@@ -46,6 +48,7 @@ export default function HomeView({ user, setPage }: HomeViewProps) {
               ? "Go to Driver Dashboard"
               : "Request Your Ride"}
           </button>
+          <PastRides user={user} />
         </div>
       )}
     </section>
