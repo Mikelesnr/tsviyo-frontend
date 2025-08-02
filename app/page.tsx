@@ -12,6 +12,7 @@ import ResendVerificationPage from "./verify-email/page";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
 import RideDetails from "./components/RideDetails";
 import PusherClient from "./components/PusherClient";
+import AdminPage from "./admin/page";
 import { useState } from "react";
 
 export default function RideHailingPage() {
@@ -40,6 +41,7 @@ export default function RideHailingPage() {
         {page === "rating" && <RatingView user={user} setPage={setPage} />}
         {page === "forgot-password" && <ForgotPasswordForm setPage={setPage} />}
         {page === "ride-details" && <RideDetails setPage={setPage} user={user} />}
+        {page === "admin" && <AdminPage user={user} setPage={setPage} />}
       </main>
     </div>
   );

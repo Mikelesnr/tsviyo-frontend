@@ -98,7 +98,7 @@ export default function Login({ setUser, setPage }: LoginProps) {
       // Redirect based on verification status
       if (newUser.email_verified_at) {
         if (newUser.role === "driver") {
-          setPage("driver-onboarding");
+          setPage("home");
         } else {
           setPage("ride-request");
         }

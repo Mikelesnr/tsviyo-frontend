@@ -1,16 +1,19 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 
-export default function ResendVerificationButton({ onResendSuccess }: { onResendSuccess: (msg: string) => void }) {
+type ResendVerificationButtonProps = {
+  token: string; 
+  onResendSuccess: (msg: string) => void;
+};
+
+export default function ResendVerificationButton({ token, onResendSuccess }: ResendVerificationButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleResend = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("authToken"); // Adjust based on how you store token
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/email/verify/resend`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/email/verify/resend`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

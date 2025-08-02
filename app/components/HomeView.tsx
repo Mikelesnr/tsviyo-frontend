@@ -49,6 +49,14 @@ export default function HomeView({ user, setPage }: HomeViewProps) {
               : "Request Your Ride"}
           </button>
           {user.role === "rider" && <PastRides user={user} />}
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setPage('admin')}
+              className="mt-4 mx-6 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+            >
+              Admin Dashboard
+            </button>
+          )}
         </div>
       )}
     </section>
