@@ -1,3 +1,5 @@
+import PWAInstallPrompt from "./PWAInstallPrompt";
+
 type HomeViewProps = {
   setPage: (page: string) => void;
 };
@@ -5,10 +7,16 @@ type HomeViewProps = {
 export default function HomeView({ setPage }: HomeViewProps) {
   return (
     <section className="max-w-4xl mx-auto text-center py-16">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome to Tsiyo RideShare</h1>
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome to Tvsiyo RideShare</h1>
       <p className="text-lg text-gray-600 mb-8">
         Your one-stop solution for ride-hailing services. Sign up or log in to get started.
       </p>
+
+      {/* PWA install prompt goes here */}
+      <div className="mb-8">
+        <PWAInstallPrompt />
+      </div>
+
       <div className="flex justify-center space-x-4">
         <button
           onClick={() => setPage("signup")}

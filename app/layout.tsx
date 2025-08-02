@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,8 +14,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Tsiyo RideShare",
-  description: "Tsiyo RideShare is a ride-hailing application that connects riders with drivers seamlessly.",
+  description:
+    "Tsiyo RideShare is a ride-hailing application that connects riders with drivers seamlessly.",
+  manifest: "/manifest.json",
 };
+
+// ✅ Proper way to define themeColor in Next.js 15+
+export const generateViewport = (): Viewport => ({
+  themeColor: "#1e1e1e",
+});
 
 export default function RootLayout({
   children,
@@ -24,6 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1e1e1e" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
