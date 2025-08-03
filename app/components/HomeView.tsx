@@ -1,3 +1,5 @@
+import PastRides from "./PastRides";
+
 type HomeViewProps = {
   user: any;
   setPage: (page: string) => void;
@@ -43,9 +45,18 @@ export default function HomeView({ user, setPage }: HomeViewProps) {
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             {user.role === "driver"
-              ? "Go to Driver Dashboard"
+              ? "Go to Driver Onboarding Page"
               : "Request Your Ride"}
           </button>
+          {user.role === "rider" && <PastRides user={user} />}
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setPage('admin')}
+              className="mt-4 mx-6 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+            >
+              Admin Dashboard
+            </button>
+          )}
         </div>
       )}
     </section>

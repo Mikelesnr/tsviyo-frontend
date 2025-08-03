@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tsiyo RideShare",
   description: "Tsiyo RideShare is a ride-hailing application that connects riders with drivers seamlessly.",
+  icons: {
+  icon: [
+    { url: "/favicon.ico" }
+  ],
+}
 };
 
 export default function RootLayout({
