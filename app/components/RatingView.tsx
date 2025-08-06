@@ -16,7 +16,7 @@ export default function RatingView({ user, setPage }: RatingViewProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert(`Thank you for your rating of ${rating} stars!`);
-    setPage("home");
+    setPage("ride-request");
   };
 
   if (!user) {

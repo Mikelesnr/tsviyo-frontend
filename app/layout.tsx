@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   description:
     "Tsiyo RideShare is a ride-hailing application that connects riders with drivers seamlessly.",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+    ],
+  },
 };
 
 // ✅ Proper way to define themeColor in Next.js 15+
