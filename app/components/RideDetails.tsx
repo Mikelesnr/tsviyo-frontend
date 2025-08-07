@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { User } from '@/types';
 
 type RideDetailsProps = {
   setPage: (page: string) => void;
-  user: any;
+  user: User | null;
 };
 
 export default function RideDetails({ setPage, user }: RideDetailsProps) {
@@ -35,6 +36,13 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
     }
 
     setLoading(true);
+
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${ride.id}/cancel`,
@@ -71,6 +79,13 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
     }
 
     setLoading(true);
+
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${ride.id}/late-cancel`,
@@ -120,9 +135,9 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
             <p className={`text-lg font-semibold ${isRideAccepted ? 'text-green-600' : 'text-blue-600'}`}>
               {ride.status
                 ? ride.status
-                    .split('_')
-                    .map((word: string)=> word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
+                  .split('_')
+                  .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')
                 : 'Unknown'}
             </p>
           )}

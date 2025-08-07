@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { User } from '@/types';
 
 type TrackingViewProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 

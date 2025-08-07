@@ -1,5 +1,7 @@
+import { User } from '@/types';
+
 type FareViewProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 

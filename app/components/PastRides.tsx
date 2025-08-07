@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { User } from '@/types';
 
 type PastRidesProps = {
-    user: any;
+    user: User | null;
 };
 
 export default function PastRides({ user }: PastRidesProps) {

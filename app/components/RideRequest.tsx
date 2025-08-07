@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { GoogleMap, Marker, DirectionsRenderer, useJsApiLoader } from "@react-google-maps/api";
 import { useRouter } from "next/navigation";
+import { User } from "@/types";
 
 type RideRequestProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 
@@ -13,8 +14,8 @@ const mapContainerStyle = {
 };
 
 const defaultCenter = {
-  lat: 6.57854,
-  lng: 3.29746, // Lagos, Nigeria
+  lat: -17.8292,
+  lng: 31.0522,
 };
 
 const RATE_PER_KM = 1; // $1 per km
@@ -66,7 +67,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
   const pickupRef = useRef<HTMLInputElement>(null);
   const dropoffRef = useRef<HTMLInputElement>(null);
 
-  const { isLoaded } = useJsApiLoader({
+   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     libraries: ["places"],
@@ -84,6 +85,12 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
     }
 
     setLoading(true);
+
+    if (!user || !user.id) {
+      alert("Authentication error. Please log in again.");
+      setPage("login");
+      return;
+    }
 
     try {
       const rideData = {
@@ -145,7 +152,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
 
     const autocomplete = new google.maps.places.Autocomplete(inputElement, {
       types: ["address"],
-      componentRestrictions: { country: "ng" },
+      componentRestrictions: { country: "zw" },
     });
 
     autocomplete.addListener("place_changed", () => {
@@ -364,8 +371,8 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
           type="submit"
           disabled={!fare || loading}
           className={`w-full py-2 rounded-md transition flex items-center justify-center gap-2 ${fare && !loading
-              ? "bg-blue-600 hover:bg-blue-700 text-white"
-              : "bg-gray-400 cursor-not-allowed text-white"
+            ? "bg-blue-600 hover:bg-blue-700 text-white"
+            : "bg-gray-400 cursor-not-allowed text-white"
             }`}
         >
           {loading ? (

@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { User } from '@/types';
 
 type SignUpProps = {
-  setUser: (user: any) => void;
+  setUser: (user: User | null) => void;
   setPage: (page: string) => void;
 };
 
@@ -92,14 +93,14 @@ export default function SignUp({ setUser, setPage }: SignUpProps) {
 
       setUser(newUser);
       if (newUser.email_verified_at) {
-        
+
         if (newUser.role === "driver") {
           setPage("driver-onboarding");
         } else {
           setPage("ride-request");
         }
       } else {
-        
+
         setPage("verify-email");
       }
     } catch (err: any) {

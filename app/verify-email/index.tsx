@@ -1,14 +1,6 @@
 'use client';
 import { useRouter } from "next/navigation";
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  token: string;
-  role: string;
-};
+import { User } from "@/types";
 
 type VerifyEmailPageProps = {
   user: User | null;
@@ -24,6 +16,8 @@ export default function ResendVerificationPage({ user, setUser, setPage }: Verif
     router.push("/login");
     return null;
   }
+
+  console.log("Sending token:", user.token);
 
   // If already verified
   if (user.email_verified_at !== null) {
