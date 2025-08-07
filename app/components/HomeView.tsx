@@ -1,7 +1,8 @@
 import PastRides from "./PastRides";
+import { User } from '@/types';
 
 type HomeViewProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 

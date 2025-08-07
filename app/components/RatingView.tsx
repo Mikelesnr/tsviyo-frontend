@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { User } from '@/types';
 
 type RatingViewProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 

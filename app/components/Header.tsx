@@ -1,8 +1,9 @@
 import { useRouter } from "next/navigation";
+import { User, Ride, Vehicle } from '@/types';
 
 type HeaderProps = {
-  user: any;
-  setUser: (user: any) => void; 
+  user: User | null;
+  setUser: (user: User | null) => void;
   setPage: (page: string) => void;
 };
 

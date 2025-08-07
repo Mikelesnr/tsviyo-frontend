@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from "react";
+import { User } from "@/types";
 
 type DriverOnboardingProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 
 export default function DriverOnboarding({ user, setPage }: DriverOnboardingProps) {
-  const [step, setStep] = useState<'profile' | 'vehicle'>('profile'); 
+  const [step, setStep] = useState<'profile' | 'vehicle'>('profile');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +40,12 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/driver/profile`, {
@@ -75,11 +82,17 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
     setLoading(true);
     setError(null);
 
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/driver/vehicles`, {
         method: 'POST',
         headers: {
-         "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
+          "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
           Accept: process.env.NEXT_PUBLIC_ACCEPT!,
           Authorization: `Bearer ${user.token}`,
         },
@@ -98,7 +111,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
 
       // ✅ Success: Onboarding complete
       alert('Onboarding complete! Your account is under review.');
-      setPage('home'); 
+      setPage('home');
     } catch (err: any) {
       setError(err.message);
     } finally {

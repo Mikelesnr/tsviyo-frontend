@@ -1,9 +1,10 @@
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { User } from '@/types';
 
 type LoginProps = {
-  setUser: (user: any) => void;
+  setUser: (user: User | null) => void;
   setPage: (page: string) => void;
 };
 
