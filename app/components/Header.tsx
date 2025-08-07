@@ -44,7 +44,7 @@ export default function Header({ user, setUser, setPage }: HeaderProps) {
           onClick={handleLogoClick}
           className="text-2xl font-bold text-blue-600 focus:outline-none"
         >
-          Tsiyo RideShare
+          Tsviyo RideShare
         </button>
 
         <div className="flex items-center space-x-6">

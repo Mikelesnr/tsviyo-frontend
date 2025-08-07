@@ -18,7 +18,7 @@ export default function EmailVerifiedForm() {
   useEffect(() => {
     if (status === "success") {
       setTitle("Email Verified Successfully! 🎉");
-      setMessage("You can now use all features of Tsiyo RideShare.");
+      setMessage("You can now use all features of Tsviyo RideShare.");
     } else if (status === "already") {
       setTitle("Email Already Verified");
       setMessage("Your email was already confirmed. You can now request rides or drive.");
