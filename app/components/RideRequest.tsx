@@ -445,7 +445,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
       </form>
 
       <p className="text-sm text-gray-500 mt-4 text-center">
-        Tip: Click 🗺️ to set location by clicking the map, or ✅ to use typed address.
+        Tip: Click 'Set from map' to set location by clicking the map, or 'Use address' to use typed address.
       </p>
     </section>
   );

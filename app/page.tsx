@@ -13,6 +13,7 @@ import ResendVerificationPage from "./verify-email/index";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
 import RideDetails from "./components/RideDetails";
 import PusherClient from "./components/PusherClient";
+import InstallPrompt from "./components/InstallPrompt";
 import AdminPage from "./admin";
 import { useState } from "react";
 import { User } from '@/types';

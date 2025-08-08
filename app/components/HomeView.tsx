@@ -9,7 +9,7 @@ type HomeViewProps = {
 export default function HomeView({ user, setPage }: HomeViewProps) {
   return (
     <section className="max-w-4xl mx-auto text-center py-16">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome to Tsiyo RideShare</h1>
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome to Tsviyo RideShare</h1>
 
       {!user ? (
         <>

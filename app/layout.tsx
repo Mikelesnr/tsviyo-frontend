@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import InstallPrompt from "./components/InstallPrompt";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const geistSans = Geist({
@@ -14,13 +15,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tsiyo RideShare",
-  description: "Tsiyo RideShare is a ride-hailing application that connects riders with drivers seamlessly.",
+  title: "Tsviyo RideShare",
+  description:
+    "Tsviyo RideShare is a ride-hailing application that connects riders with drivers seamlessly.",
   icons: {
-  icon: [
-    { url: "/favicon.ico" }
-  ],
-}
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-192x192.png", type: "image/png" },
+      { url: "/icons/icon-512x512.png", type: "image/png" },
+    ],
+    apple: "/icons/icon-192x192.png",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -30,9 +36,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        {/* PWA meta tags */}
+        <meta name="theme-color" content="#000000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <InstallPrompt />
         {children}
       </body>
     </html>
