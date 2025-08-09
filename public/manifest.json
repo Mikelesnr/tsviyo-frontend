@@ -1,11 +1,11 @@
 {
   "name": "Tsviyo RideShare",
   "short_name": "Tsviyo",
+  "description": "RideShare app built with Next.js and PWA support",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "description": "Tsviyo RideShare connects riders with drivers seamlessly.",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -15,11 +15,6 @@
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/favicon-96x96.png",
-      "sizes": "96x96",
       "type": "image/png"
     }
   ]

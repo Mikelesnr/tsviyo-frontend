@@ -9,7 +9,7 @@ type User = {
 
 export default function EmailVerifiedForm() {
   const searchParams = useSearchParams();
-  const status = searchParams.get("status");
+  const status = searchParams ? searchParams.get("status") ?? "" : "";
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);

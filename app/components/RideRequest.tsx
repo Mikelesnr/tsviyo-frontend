@@ -5,8 +5,9 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { User } from '@/types';
 
-// Mapbox access token
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_MAPS_TOKEN!;
+// Mapbox access token;
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_MAPS_TOKEN || '';
+
 
 type RideRequestProps = {
   user: User | null;
