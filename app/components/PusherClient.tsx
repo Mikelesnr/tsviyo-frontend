@@ -1,3 +1,4 @@
+// app/components/PusherClient.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,7 +14,6 @@ declare global {
 type Ride = {
   id: number;
   rider_id: number;
-  driver_id: number | null;
   pickup_address: string;
   dropoff_address: string;
   pickup_lat: number;
@@ -28,19 +28,20 @@ type Ride = {
 
 type PusherClientProps = {
   user: User | null;
+  setPage: (page: string) => void;
 };
 
-export default function PusherClient({ user }: PusherClientProps) {
+export default function PusherClient({ user, setPage }: PusherClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
   const [alertMessage, setAlertMessage] = useState("");
-  const [ride_id, setRideId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!user) return;
+
+    // Avoid duplicate script
+    if (document.getElementById("pusher-script")) return;
 
     const script = document.createElement("script");
     script.id = "pusher-script";
@@ -62,28 +63,32 @@ export default function PusherClient({ user }: PusherClientProps) {
         console.log(`[Pusher] ${states.previous} → ${states.current}`);
       });
 
-      // Subscribe to public channel for new ride requests
+      // Subscribe to public channel
+      const channel = pusher.subscribe("rides.nearby");
+
+      channel.bind("pusher:subscription_succeeded", () => {
+        console.log('✅ Subscribed to "rides.nearby"');
+      });
+
+      channel.bind("pusher:subscription_error", (err: any) => {
+        console.error("❌ Subscription error:", err);
+      });
+
+      // 🚗 DRIVER: Listen for new ride requests
       if (user.role === "driver") {
-        const channel = pusher.subscribe("rides.nearby");
-
-        channel.bind("pusher:subscription_succeeded", () => {
-          console.log('✅ Subscribed to "rides.nearby"');
-        });
-
         channel.bind("RideRequested", (data: any) => {
           console.log("🚨 Driver: Ride requested:", data);
           const rideData = data.ride;
-          setRideId(rideData.id);
+
           const newRide: Ride = {
             id: rideData.id,
             rider_id: rideData.rider_id,
-            driver_id: null, // Driver ID will be assigned later
             pickup_address: rideData.pickup_add || "Unknown Pickup",
             dropoff_address: rideData.dropoff_add || "Unknown Dropoff",
-            pickup_lat: rideData.pickup_lat,
-            pickup_lng: rideData.pickup_lng,
-            dropoff_lat: rideData.dropoff_lat,
-            dropoff_lng: rideData.dropoff_lng,
+            pickup_lat: parseFloat(rideData.pickup_lat),
+            pickup_lng: parseFloat(rideData.pickup_lng),
+            dropoff_lat: parseFloat(rideData.dropoff_lat),
+            dropoff_lng: parseFloat(rideData.dropoff_lng),
             fare:
               typeof rideData.fare === "string"
                 ? parseFloat(rideData.fare)
@@ -99,7 +104,7 @@ export default function PusherClient({ user }: PusherClientProps) {
         });
       }
 
-      // Subscribe to private channel for ride updates
+      // 👤 RIDER: Listen for ride acceptance and cancellation
       if (user.role === "rider") {
         const channel = pusher.subscribe("rides.nearby");
 
@@ -142,7 +147,10 @@ export default function PusherClient({ user }: PusherClientProps) {
         });
       }
 
+      // Cleanup
       return () => {
+        channel.unbind_all();
+        channel.unsubscribe();
         pusher.disconnect();
       };
     };
@@ -159,7 +167,7 @@ export default function PusherClient({ user }: PusherClientProps) {
         document.head.removeChild(scriptTag);
       }
     };
-  }, [user]);
+  }, [user, setPage]);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -168,18 +176,11 @@ export default function PusherClient({ user }: PusherClientProps) {
   };
 
   const handleAcceptRide = async () => {
-    setLoading(true);
-    setError(null);
-
-    if (!user || !user.token) {
-      setError("Authentication error: User not logged in.");
-      setLoading(false);
-      return;
-    }
+    if (!selectedRide || !user) return;
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/driver/rides/${ride_id}/accept`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/driver/rides/${selectedRide.id}/accept`,
         {
           method: "PATCH",
           headers: {
@@ -198,11 +199,23 @@ export default function PusherClient({ user }: PusherClientProps) {
 
       // ✅ Success: You can update UI or redirect
       console.log("Ride accepted:", data);
-      closeModal();
-    } catch (err: any) {
-      setError(err.message);
+
+      // ✅ Store accepted ride
+      localStorage.setItem(
+        "currentRide",
+        JSON.stringify({
+          ...selectedRide,
+          status: "accepted",
+          driver_id: user.id,
+        })
+      );
+
+      // ✅ Go to tracking
+      setPage("tracking");
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
     } finally {
-      setLoading(false);
+      closeModal();
     }
   };
 
@@ -242,12 +255,9 @@ export default function PusherClient({ user }: PusherClientProps) {
                     ).toFixed(2)}
                   </p>
                   <p className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-black-600" />
+                    <Clock className="h-4 w-4 text-gray-600" />
                     <strong>Time:</strong>{" "}
-                    {new Date(
-                      new Date(selectedRide.timestamp).getTime() -
-                        60 * 60 * 1000
-                    ).toLocaleTimeString()}
+                    {new Date(selectedRide.timestamp).toLocaleTimeString()}
                   </p>
                 </>
               ) : (
@@ -255,13 +265,30 @@ export default function PusherClient({ user }: PusherClientProps) {
               )}
             </div>
 
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={user?.role === "rider" ? closeModal : handleAcceptRide}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                {user?.role === "rider" ? "Ok" : "Accept Ride"}
-              </button>
+            <div className="mt-6 flex justify-end gap-3">
+              {user?.role === "driver" && selectedRide ? (
+                <>
+                  <button
+                    onClick={closeModal}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    Ignore
+                  </button>
+                  <button
+                    onClick={handleAcceptRide}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                  >
+                    Accept Ride
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={closeModal}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  OK
+                </button>
+              )}
             </div>
           </div>
         </div>
