@@ -320,7 +320,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
 
   return (
     <section className="max-w-2xl mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Request a Ride</h2>
+      <h2 className="text-2xl font-bold text-black-800 mb-6 text-center">Request a Ride</h2>
 
       {/* 🗺️ MAPBOX MAP */}
       <div className="rounded-lg shadow-md mb-6 overflow-hidden" style={mapContainerStyle}>
@@ -330,7 +330,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
       {/* 📝 FORM */}
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Pickup Location</label>
+          <label className="block text-black-700 mb-2">Pickup Location</label>
           <input
             ref={pickupRef}
             type="text"
@@ -358,14 +358,14 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
             </button>
           </div>
           {pickupCoords && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black-500 mt-1">
               Set: {pickupCoords.lat.toFixed(6)}, {pickupCoords.lng.toFixed(6)}
             </p>
           )}
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Dropoff Location</label>
+          <label className="block text-black-700 mb-2">Dropoff Location</label>
           <input
             ref={dropoffRef}
             type="text"
@@ -393,14 +393,14 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
             </button>
           </div>
           {dropoffCoords && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black-500 mt-1">
               Set: {dropoffCoords.lat.toFixed(6)}, {dropoffCoords.lng.toFixed(6)}
             </p>
           )}
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Pickup Time</label>
+          <label className="block text-black-700 mb-2">Pickup Time</label>
           <input
             type="datetime-local"
             name="pickupTime"
@@ -445,7 +445,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
         </button>
       </form>
 
-      <p className="text-sm text-gray-500 mt-4 text-center">
+      <p className="text-sm text-black-500 mt-4 text-center">
         Tip: Click 'Set from map' to set location by clicking the map, or 'Use address' to use typed address.
       </p>
     </section>

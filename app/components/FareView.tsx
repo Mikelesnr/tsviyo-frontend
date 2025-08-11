@@ -20,7 +20,7 @@ export default function FareView({ user, setPage }: FareViewProps) {
 
   return (
     <section className="max-w-md mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Fare Details</h2>
+      <h2 className="text-2xl font-bold text-black-800 mb-6 text-center">Fare Details</h2>
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="mb-4">
           <div className="flex justify-between border-b pb-2 mb-2">

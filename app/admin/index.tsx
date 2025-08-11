@@ -212,7 +212,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
   if (loading) {
     return (
       <div className="text-center py-16">
-        <p className="text-lg text-gray-600">Loading admin dashboard...</p>
+        <p className="text-lg text-black-600">Loading admin dashboard...</p>
       </div>
     );
   }
@@ -233,7 +233,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto mt-12 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold text-black-800 mb-8 text-center">Admin Dashboard</h1>
 
       {error && <p className="p-4 mb-6 bg-red-100 text-red-700 rounded">{error}</p>}
 
@@ -254,7 +254,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-gray-500">
+                  <td colSpan={5} className="py-4 text-center text-black-500">
                     No non-driver users found.
                   </td>
                 </tr>
@@ -303,7 +303,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
             <tbody>
               {drivers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-4 text-center text-gray-500">
+                  <td colSpan={6} className="py-4 text-center text-black-500">
                     No drivers found.
                   </td>
                 </tr>
@@ -329,10 +329,10 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
                       {driver.vehicle ? (
                         <div>
                           <div>{driver.vehicle.make} {driver.vehicle.model}</div>
-                          <div className="text-gray-500 text-xs">{driver.vehicle.plate_number}</div>
+                          <div className="text-black-500 text-xs">{driver.vehicle.plate_number}</div>
                         </div>
                       ) : (
-                        <span className="text-gray-400">No vehicle</span>
+                        <span className="text-black-400">No vehicle</span>
                       )}
                     </td>
                     <td className="py-2 px-4 border-b space-y-1">
@@ -393,7 +393,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
             <tbody>
               {vehicles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-gray-500">
+                  <td colSpan={5} className="py-4 text-center text-black-500">
                     No vehicles found.
                   </td>
                 </tr>
@@ -418,7 +418,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
                           {v.driver_id}
                         </a>
                       ) : (
-                        <span className="text-gray-400">Unassigned</span>
+                        <span className="text-black-400">Unassigned</span>
                       )}
                     </td>
                   </tr>

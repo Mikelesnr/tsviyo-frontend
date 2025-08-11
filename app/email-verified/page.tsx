@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 function Loading() {
   return (
     <div className="text-center py-8">
-      <p className="text-gray-600">Loading verification status...</p>
+      <p className="text-black-600">Loading verification status...</p>
     </div>
   );
 }

@@ -69,13 +69,13 @@ export default function ResetPasswordForm() {
 
   return (
     <div className="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Reset Password</h1>
+      <h1 className="text-2xl font-bold text-black-800 mb-6">Reset Password</h1>
 
-      <p className="text-gray-600 mb-6">Enter your new password below.</p>
+      <p className="text-black-600 mb-6">Enter your new password below.</p>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Email</label>
+          <label className="block text-black-700 mb-2">Email</label>
           <input
             type="email"
             value={email}
@@ -87,7 +87,7 @@ export default function ResetPasswordForm() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">New Password</label>
+          <label className="block text-black-700 mb-2">New Password</label>
           <input
             type={showPassword ? "text" : "password"}
             value={password}
@@ -99,7 +99,7 @@ export default function ResetPasswordForm() {
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 mb-2">Confirm Password</label>
+          <label className="block text-black-700 mb-2">Confirm Password</label>
           <input
             type={showPassword ? "text" : "password"}
             value={passwordConfirmation}

@@ -50,7 +50,7 @@ export default function Header({ user, setUser, setPage }: HeaderProps) {
         <div className="flex items-center space-x-6">
           {/* User Info: Role and Name */}
           {user && (
-            <span className="text-sm text-gray-600 font-medium">
+            <span className="text-sm text-black-600 font-medium">
               {user.role === "driver" ? "Driver" : "Rider"}: {user.name}
             </span>
           )}

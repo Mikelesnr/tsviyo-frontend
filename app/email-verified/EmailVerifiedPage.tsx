@@ -45,7 +45,7 @@ export default function EmailVerifiedForm() {
   return (
     <div className="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-md text-center">
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      <p className="text-gray-600 mb-6">{message}</p>
+      <p className="text-black-600 mb-6">{message}</p>
 
       <button
         onClick={handleContinue}
