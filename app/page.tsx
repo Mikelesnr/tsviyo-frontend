@@ -28,7 +28,7 @@ export default function RideHailingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PusherClient user={user} />
+      <PusherClient user={user} setPage={setPage} />
       <Header user={user} setUser={setUser} setPage={setPage} />
 
       <main className="container mx-auto px-4 py-8">
