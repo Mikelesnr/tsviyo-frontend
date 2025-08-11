@@ -1,21 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-};
-
-type Vehicle = {
-  id: number;
-  make: string;
-  model: string;
-  plate_number: string;
-  driver_id: number | null;
-};
+import { User, Ride, Vehicle } from '@/types';
 
 type DriverStatus = 'active' | 'inactive' | 'suspended';
 
@@ -24,12 +10,12 @@ type Driver = {
   user_id: number;
   license_number: string;
   status: DriverStatus;
-  user: User;
+  user: User | null;
   vehicle?: Vehicle;
 };
 
 type AdminPageProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 
@@ -57,6 +43,12 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
   const fetchAdminData = async () => {
     setLoading(true);
     setError(null);
+
+    if (!user || !user.id) {
+      alert("Authentication error. Please log in again.");
+      setPage("login");
+      return;
+    }
 
     try {
       const token = user.token;
@@ -147,6 +139,12 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
   const handleDeleteUser = async (userId: number) => {
     if (!window.confirm('Delete this user permanently? This cannot be undone.')) return;
 
+    if (!user || !user.id) {
+      alert("Authentication error. Please log in again.");
+      setPage("login");
+      return;
+    }
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/users/${userId}`, {
         method: 'DELETE',
@@ -167,12 +165,19 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
   };
 
   const handleDriverAction = async (action: string, driverId: number) => {
+
+    if (!user || !user.id) {
+      alert("Authentication error. Please log in again.");
+      setPage("login");
+      return;
+    }
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/drivers/${driverId}/${action}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${user.token}`,
-         "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
+          "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
           Accept: process.env.NEXT_PUBLIC_ACCEPT!,
         },
       });
@@ -207,7 +212,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
   if (loading) {
     return (
       <div className="text-center py-16">
-        <p className="text-lg text-gray-600">Loading admin dashboard...</p>
+        <p className="text-lg text-black-600">Loading admin dashboard...</p>
       </div>
     );
   }
@@ -228,7 +233,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto mt-12 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold text-black-800 mb-8 text-center">Admin Dashboard</h1>
 
       {error && <p className="p-4 mb-6 bg-red-100 text-red-700 rounded">{error}</p>}
 
@@ -249,7 +254,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-gray-500">
+                  <td colSpan={5} className="py-4 text-center text-black-500">
                     No non-driver users found.
                   </td>
                 </tr>
@@ -298,7 +303,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
             <tbody>
               {drivers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-4 text-center text-gray-500">
+                  <td colSpan={6} className="py-4 text-center text-black-500">
                     No drivers found.
                   </td>
                 </tr>
@@ -306,15 +311,15 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
                 drivers.map((driver) => (
                   <tr key={driver.id} className="hover:bg-gray-50">
                     <td className="py-2 px-4 border-b">{driver.id}</td>
-                    <td className="py-2 px-4 border-b">{driver.user.name}</td>
-                    <td className="py-2 px-4 border-b">{driver.user.email}</td>
+                    <td className="py-2 px-4 border-b">{driver.user?.name || 'Unknown'}</td>
+                    <td className="py-2 px-4 border-b">{driver.user?.email || 'N/A'}</td>
                     <td className="py-2 px-4 border-b">
                       <span
                         className={`px-2 py-1 text-xs rounded ${driver.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : driver.status === 'suspended'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-green-100 text-green-800'
+                          : driver.status === 'suspended'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
                           }`}
                       >
                         {driver.status}
@@ -324,10 +329,10 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
                       {driver.vehicle ? (
                         <div>
                           <div>{driver.vehicle.make} {driver.vehicle.model}</div>
-                          <div className="text-gray-500 text-xs">{driver.vehicle.plate_number}</div>
+                          <div className="text-black-500 text-xs">{driver.vehicle.plate_number}</div>
                         </div>
                       ) : (
-                        <span className="text-gray-400">No vehicle</span>
+                        <span className="text-black-400">No vehicle</span>
                       )}
                     </td>
                     <td className="py-2 px-4 border-b space-y-1">
@@ -388,7 +393,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
             <tbody>
               {vehicles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-gray-500">
+                  <td colSpan={5} className="py-4 text-center text-black-500">
                     No vehicles found.
                   </td>
                 </tr>
@@ -413,7 +418,7 @@ export default function AdminPage({ user, setPage }: AdminPageProps) {
                           {v.driver_id}
                         </a>
                       ) : (
-                        <span className="text-gray-400">Unassigned</span>
+                        <span className="text-black-400">Unassigned</span>
                       )}
                     </td>
                   </tr>

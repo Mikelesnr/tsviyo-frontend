@@ -43,12 +43,12 @@ export default function ForgotPasswordForm({ setPage }: { setPage: (page: string
 
   return (
     <section className="max-w-md mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Forgot Password?</h2>
-      <p className="text-gray-600 mb-6 text-center">Enter your email to receive a password reset link.</p>
+      <h2 className="text-2xl font-bold text-black-800 mb-6 text-center">Forgot Password?</h2>
+      <p className="text-black-600 mb-6 text-center">Enter your email to receive a password reset link.</p>
 
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Email</label>
+          <label className="block text-black-700 mb-2">Email</label>
           <input
             type="email"
             value={email}

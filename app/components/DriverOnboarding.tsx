@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from "react";
+import { User } from "@/types";
 
 type DriverOnboardingProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 
 export default function DriverOnboarding({ user, setPage }: DriverOnboardingProps) {
-  const [step, setStep] = useState<'profile' | 'vehicle'>('profile'); 
+  const [step, setStep] = useState<'profile' | 'vehicle'>('profile');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +40,12 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/driver/profile`, {
@@ -75,11 +82,17 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
     setLoading(true);
     setError(null);
 
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/driver/vehicles`, {
         method: 'POST',
         headers: {
-         "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
+          "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
           Accept: process.env.NEXT_PUBLIC_ACCEPT!,
           Authorization: `Bearer ${user.token}`,
         },
@@ -98,7 +111,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
 
       // ✅ Success: Onboarding complete
       alert('Onboarding complete! Your account is under review.');
-      setPage('home'); 
+      setPage('home');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -116,7 +129,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
 
   return (
     <section className="max-w-md mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Driver Onboarding</h2>
+      <h2 className="text-2xl font-bold text-black-800 mb-6 text-center">Driver Onboarding</h2>
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md text-sm">
@@ -130,7 +143,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
           <h3 className="text-xl font-semibold mb-4">Step 1: Driver Profile</h3>
 
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">License Number</label>
+            <label className="block text-black-700 mb-2">License Number</label>
             <input
               type="text"
               name="licenseNumber"
@@ -143,7 +156,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Profile Image URL (Optional)</label>
+            <label className="block text-black-700 mb-2">Profile Image URL (Optional)</label>
             <input
               type="url"
               name="imageUrl"
@@ -170,7 +183,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
           <h3 className="text-xl font-semibold mb-4">Step 2: Vehicle Information</h3>
 
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Make</label>
+            <label className="block text-black-700 mb-2">Make</label>
             <input
               type="text"
               name="make"
@@ -182,7 +195,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Model</label>
+            <label className="block text-black-700 mb-2">Model</label>
             <input
               type="text"
               name="model"
@@ -194,7 +207,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">License Plate</label>
+            <label className="block text-black-700 mb-2">License Plate</label>
             <input
               type="text"
               name="licensePlate"
@@ -206,7 +219,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Year</label>
+            <label className="block text-black-700 mb-2">Year</label>
             <input
               type="number"
               name="year"
@@ -221,7 +234,7 @@ export default function DriverOnboarding({ user, setPage }: DriverOnboardingProp
             <button
               type="button"
               onClick={() => setStep('profile')}
-              className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              className="flex-1 py-2 border border-gray-300 text-black-700 rounded-md hover:bg-gray-50"
             >
               Back
             </button>

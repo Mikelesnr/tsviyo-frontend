@@ -1,10 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { User } from '@/types';
+
+declare global {
+  interface Window {
+    Pusher?: any;
+  }
+}
 
 type RideDetailsProps = {
   setPage: (page: string) => void;
-  user: any;
+  user: User | null;
 };
 
 export default function RideDetails({ setPage, user }: RideDetailsProps) {
@@ -13,11 +20,19 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [error, setError] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
 
+  // Load ride from localStorage
   useEffect(() => {
     const savedRide = localStorage.getItem('currentRide');
     if (savedRide) {
-      setRide(JSON.parse(savedRide));
+      const parsedRide = JSON.parse(savedRide);
+      setRide(parsedRide);
+
+      if (parsedRide.status === 'accepted' && !sessionStorage.getItem('acceptance-alert-seen')) {
+        setShowAlert(true);
+        sessionStorage.setItem('acceptance-alert-seen', 'true');
+      }
     }
   }, []);
 
@@ -27,7 +42,7 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
 
   const isRideAccepted = ['accepted', 'en_route', 'arrived', 'in_progress'].includes(ride.status?.toLowerCase());
 
-  // Simple cancel (no reason needed)
+  // Simple cancel
   const handleCancelRide = async () => {
     if (isRideAccepted) {
       setShowCancelModal(true);
@@ -35,23 +50,22 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
     }
 
     setLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${ride.id}/cancel`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': process.env.NEXT_PUBLIC_CONTENT_TYPE!,
-            Accept: process.env.NEXT_PUBLIC_ACCEPT!,
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+    if (!user || !user.token) {
+      setError("Auth error");
+      setLoading(false);
+      return;
+    }
 
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || 'Failed to cancel ride');
-      }
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${ride.id}/cancel`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to cancel');
 
       localStorage.removeItem('currentRide');
       setPage('ride-request');
@@ -62,33 +76,32 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
     }
   };
 
-  // Cancel with reason (late cancel)
   const handleLateCancel = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cancelReason.trim()) {
-      setError('Please provide a reason for cancellation.');
+      setError('Provide reason');
       return;
     }
 
     setLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${ride.id}/late-cancel`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': process.env.NEXT_PUBLIC_CONTENT_TYPE!,
-            Accept: process.env.NEXT_PUBLIC_ACCEPT!,
-            Authorization: `Bearer ${user.token}`,
-          },
-          body: JSON.stringify({ reason: cancelReason }),
-        }
-      );
 
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || 'Failed to cancel ride after acceptance');
-      }
+    if (!user || !user.token) {
+      setError("Authentication error: User not logged in.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${ride.id}/late-cancel`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason: cancelReason }),
+      });
+
+      if (!res.ok) throw new Error('Failed to cancel');
 
       localStorage.removeItem('currentRide');
       setPage('ride-request');
@@ -104,7 +117,6 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Your Ride</h2>
 
       <div className="space-y-4">
-        {/* Status */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Status</label>
           {ride.status === 'requested' ? (
@@ -117,43 +129,40 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
               </span>
             </div>
           ) : (
-            <p className={`text-lg font-semibold ${isRideAccepted ? 'text-green-600' : 'text-blue-600'}`}>
+            <p
+              className={`text-lg font-semibold ${isRideAccepted ? 'text-green-600' : 'text-blue-600'
+                }`}
+            >
               {ride.status
-                ? ride.status
-                    .split('_')
-                    .map((word: string)=> word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
-                : 'Unknown'}
+                ?.split('_')
+                .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' ') || 'Unknown'}
             </p>
           )}
         </div>
 
-        {/* Pickup */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Pickup</label>
           <p className="text-gray-800">{ride.pickup_address}</p>
         </div>
 
-        {/* Dropoff */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Dropoff</label>
           <p className="text-gray-800">{ride.dropoff_address}</p>
         </div>
 
-        {/* Fare */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Fare</label>
-          <p className="text-xl font-bold text-green-600">${ride.fare?.toFixed(2)}</p>
+          <p className="text-xl font-bold text-green-600">${(typeof ride.fare === 'number' ? ride.fare : 0).toFixed(2)}</p>
         </div>
 
-        {/* Pickup Time */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Pickup Time</label>
           <p className="text-gray-800">{new Date(ride.pickup_time).toLocaleString()}</p>
         </div>
       </div>
 
-      {/* Track Driver Button – Only if ride is accepted */}
+      {/* ✅ Show "Track Driver" when accepted */}
       {isRideAccepted && (
         <button
           onClick={() => setPage('tracking')}
@@ -163,7 +172,6 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
         </button>
       )}
 
-      {/* Cancel Ride Button */}
       <button
         onClick={handleCancelRide}
         disabled={loading}
@@ -172,7 +180,6 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
         {loading ? 'Canceling...' : 'Cancel Ride'}
       </button>
 
-      {/* Error */}
       {error && <p className="mt-4 text-red-600 text-sm">{error}</p>}
 
       {/* Cancel Modal */}
@@ -180,9 +187,7 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Late Cancellation</h3>
-            <p className="text-gray-600 mb-4">
-              This ride has already been accepted. Please provide a reason for cancellation.
-            </p>
+            <p className="text-gray-600 mb-4">This ride has been accepted. Please provide a reason.</p>
             <form onSubmit={handleLateCancel}>
               <textarea
                 value={cancelReason}
@@ -210,6 +215,23 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Acceptance Alert Modal */}
+      {showAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h3 className="text-xl font-bold text-green-600 mb-2">Ride Accepted!</h3>
+            <p className="text-gray-700">A driver has accepted your ride. You can now track them.</p>
+            <button
+              onClick={() => setShowAlert(false)}
+              className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              Got it
+            </button>
           </div>
         </div>
       )}

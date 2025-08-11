@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { User } from '@/types';
 
 type RatingViewProps = {
-  user: any;
+  user: User | null;
   setPage: (page: string) => void;
 };
 
@@ -29,10 +30,10 @@ export default function RatingView({ user, setPage }: RatingViewProps) {
 
   return (
     <section className="max-w-md mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Rate Your Ride</h2>
+      <h2 className="text-2xl font-bold text-black-800 mb-6 text-center">Rate Your Ride</h2>
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="mb-6">
-          <p className="text-center text-gray-700 mb-4">How was your experience?</p>
+          <p className="text-center text-black-700 mb-4">How was your experience?</p>
           <div className="flex justify-center space-x-2 mb-4">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -40,7 +41,7 @@ export default function RatingView({ user, setPage }: RatingViewProps) {
                 type="button"
                 onClick={() => handleRating(star)}
                 className={`text-2xl focus:outline-none ${
-                  star <= rating ? "text-yellow-500" : "text-gray-300"
+                  star <= rating ? "text-yellow-500" : "text-black-300"
                 }`}
               >
                 ★
@@ -48,14 +49,14 @@ export default function RatingView({ user, setPage }: RatingViewProps) {
             ))}
           </div>
           {rating > 0 && (
-            <p className="text-center text-gray-600">
+            <p className="text-center text-black-600">
               You rated {rating} {rating === 1 ? "star" : "stars"}
             </p>
           )}
         </div>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Additional Comments</label>
+            <label className="block text-black-700 mb-2">Additional Comments</label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}

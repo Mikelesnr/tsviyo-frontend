@@ -1,9 +1,10 @@
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { User } from '@/types';
 
 type LoginProps = {
-  setUser: (user: any) => void;
+  setUser: (user: User | null) => void;
   setPage: (page: string) => void;
 };
 
@@ -114,7 +115,7 @@ export default function Login({ setUser, setPage }: LoginProps) {
 
   return (
     <section className="max-w-md mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Log In</h2>
+      <h2 className="text-2xl font-bold text-black-800 mb-6 text-center">Log In</h2>
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md text-sm">
@@ -125,7 +126,7 @@ export default function Login({ setUser, setPage }: LoginProps) {
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
         {/* Email Field */}
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Email</label>
+          <label className="block text-black-700 mb-2">Email</label>
           <input
             type="email"
             name="email"
@@ -139,7 +140,7 @@ export default function Login({ setUser, setPage }: LoginProps) {
 
         {/* Password Field */}
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Password</label>
+          <label className="block text-black-700 mb-2">Password</label>
           <input
             type={showPassword ? "text" : "password"}
             name="password"
@@ -160,11 +161,11 @@ export default function Login({ setUser, setPage }: LoginProps) {
               onChange={() => setShowPassword(!showPassword)}
               className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
             />
-            <span className="text-sm text-gray-700">Show password</span>
+            <span className="text-sm text-black-700">Show password</span>
           </label>
         </div>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-sm text-black-600">
           Forgot your password?{" "}
           <button
             type="button"
@@ -211,7 +212,7 @@ export default function Login({ setUser, setPage }: LoginProps) {
         </button>
 
         {/* Switch to Sign Up */}
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-sm text-black-600">
           Don't have an account?{" "}
           <button
             type="button"

@@ -1,14 +1,6 @@
 'use client';
 import { useRouter } from "next/navigation";
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  token: string;
-  role: string;
-};
+import { User } from "@/types";
 
 type VerifyEmailPageProps = {
   user: User | null;
@@ -25,12 +17,14 @@ export default function ResendVerificationPage({ user, setUser, setPage }: Verif
     return null;
   }
 
+  console.log("Sending token:", user.token);
+
   // If already verified
   if (user.email_verified_at !== null) {
     return (
       <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold text-green-600 mb-4">✅ Email Already Verified</h1>
-        <p className="text-gray-600 mb-6">
+        <p className="text-black-600 mb-6">
           Your email has already been verified. You can now request rides or drive.
         </p>
         <button
@@ -77,9 +71,9 @@ export default function ResendVerificationPage({ user, setUser, setPage }: Verif
 
   return (
     <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Verify Your Email</h1>
+      <h1 className="text-2xl font-bold text-black-800 mb-6">Verify Your Email</h1>
 
-      <p className="text-gray-600 mb-6">
+      <p className="text-black-600 mb-6">
         We’ve sent a verification link to <strong>{user.email}</strong>. Please check your inbox.
       </p>
 
