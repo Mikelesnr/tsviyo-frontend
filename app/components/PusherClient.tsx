@@ -1,5 +1,3 @@
-// app/components/PusherClient.tsx
-"use client";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -30,10 +28,9 @@ type Ride = {
 
 type PusherClientProps = {
   user: User | null;
-  setPage: (page: string) => void;
 };
 
-export default function PusherClient({ user, setPage }: PusherClientProps) {
+export default function PusherClient({ user }: PusherClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
   const [alertMessage, setAlertMessage] = useState("");
@@ -125,12 +122,6 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
               "🎉 Your ride has been accepted! A driver is on the way."
             );
             setIsModalOpen(true);
-
-            // Update localStorage
-            localStorage.setItem(
-              "currentRide",
-              JSON.stringify({ ...ride, status: "accepted" })
-            );
           }
         });
 
@@ -151,10 +142,7 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
         });
       }
 
-      // Cleanup
       return () => {
-        channel.unbind_all();
-        channel.unsubscribe();
         pusher.disconnect();
       };
     };
@@ -171,7 +159,7 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
         document.head.removeChild(scriptTag);
       }
     };
-  }, [user, setPage]);
+  }, [user]);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -215,43 +203,6 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAcceptRide = async () => {
-    if (!selectedRide || !user) return;
-
-    try {
-      // const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/${selectedRide.id}/accept`, {
-      //   method: 'PATCH',
-      //   headers: {
-      //     'Authorization': `Bearer ${user.token}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
-
-      // const data = await response.json();
-
-      // if (!response.ok) {
-      //   throw new Error(data.message || 'Failed to accept ride');
-      // }
-
-      // ✅ Store accepted ride
-      localStorage.setItem(
-        "currentRide",
-        JSON.stringify({
-          ...selectedRide,
-          status: "accepted",
-          driver_id: user.id,
-        })
-      );
-
-      // ✅ Go to tracking
-      setPage("tracking");
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
-    } finally {
-      closeModal();
     }
   };
 
