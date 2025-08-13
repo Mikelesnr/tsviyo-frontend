@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { User } from '@/types';
+import toast from 'react-hot-toast';
 
 // Mapbox access token;
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_MAPS_TOKEN || '';
@@ -235,7 +236,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
   const handleManualLocation = (field: 'pickup' | 'dropoff') => {
     const address = field === 'pickup' ? formData.pickup : formData.dropoff;
     if (!address) {
-      alert(`Please enter a ${field} address.`);
+      toast.error(`Please enter a ${field} address.`);
       return;
     }
 
@@ -246,9 +247,9 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
         } else {
           setDropoffCoords(coords);
         }
-        alert(`${field.charAt(0).toUpperCase() + field.slice(1)} location set manually.`);
+        toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} location set manually.`);
       } else {
-        alert('Could not find location. Try a more specific address.');
+        toast.error('Could not find location. Try a more specific address.');
       }
     });
   };
@@ -256,11 +257,11 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pickupCoords || !dropoffCoords) {
-      alert('Please set both pickup and dropoff locations.');
+      toast.error('Please set both pickup and dropoff locations.');
       return;
     }
     if (!user || !user.token) {
-      alert('Authentication error. Please log in again.');
+      toast.error('Authentication error. Please log in again.');
       setPage('login');
       return;
     }
@@ -312,7 +313,7 @@ export default function RideRequest({ user, setPage }: RideRequestProps) {
 
       setPage('ride-details');
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }

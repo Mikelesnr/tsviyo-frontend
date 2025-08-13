@@ -1,9 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { User } from '@/types';
-import Map, { Marker, Popup, NavigationControl, GeolocateControl, FullscreenControl, ScaleControl } from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { useState, useEffect, useRef } from "react";
+import { User } from "@/types";
+import Map, {
+  Marker,
+  Popup,
+  NavigationControl,
+  GeolocateControl,
+  FullscreenControl,
+  ScaleControl,
+} from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import toast from "react-hot-toast";
 
 type Driver = {
   id: number;
@@ -35,10 +43,13 @@ const initialViewState = {
   pitch: 0,
 };
 
-const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_MAPS_TOKEN || '';
+const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_MAPS_TOKEN || "";
 
 // Simulate route line
-const generateRouteLine = (pickup: [number, number], dropoff: [number, number]) => {
+const generateRouteLine = (
+  pickup: [number, number],
+  dropoff: [number, number]
+) => {
   const steps = 20;
   const route: [number, number][] = [];
   for (let i = 0; i <= steps; i++) {
@@ -55,7 +66,9 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
   const [ride, setRide] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [eta, setEta] = useState(5); // minutes
-  const [driverLocation, setDriverLocation] = useState<[number, number] | null>(null);
+  const [driverLocation, setDriverLocation] = useState<[number, number] | null>(
+    null
+  );
   const [route, setRoute] = useState<[number, number][] | null>(null);
   const mapRef = useRef<any>(null);
   const [driver, setDriver] = useState<Driver | null>(null);
@@ -131,7 +144,7 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
 
   // Fetch driver profile
   const fetchDriverProfile = async (driverId: number) => {
-    if (!user?.token || user.role === 'driver') return;
+    if (!user?.token || user.role === "driver") return;
 
     try {
       const res = await fetch(
@@ -141,7 +154,7 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
           headers: {
             Authorization: `Bearer ${user.token}`,
             "Content-Type": process.env.NEXT_PUBLIC_CONTENT_TYPE!,
-            "Accept": process.env.NEXT_PUBLIC_ACCEPT!,
+            Accept: process.env.NEXT_PUBLIC_ACCEPT!,
           },
         }
       );
@@ -157,22 +170,23 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
     }
   };
 
-
   // Handle ride start/end (driver only)
   const handleStartRide = () => {
-    alert('Ride started');
+    toast.success("Ride started");
   };
 
   const handleEndRide = () => {
-    alert('Ride ended');
-    localStorage.removeItem('acceptedRide');
-    setPage('fare');
+    toast.success("Ride ended");
+    localStorage.removeItem("acceptedRide");
+    setPage("fare");
   };
 
   if (!user || !ride) {
     return (
       <div className="text-center py-16">
-        <p className="text-lg text-red-600">Please log in and request a ride.</p>
+        <p className="text-lg text-red-600">
+          Please log in and request a ride.
+        </p>
       </div>
     );
   }
@@ -183,31 +197,45 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
 
   return (
     <section className="max-w-2xl mx-auto mt-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Tracking Your Ride</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Tracking Your Ride
+      </h2>
 
       {/* Map */}
       <div className="rounded-lg shadow-md mb-6 overflow-hidden">
         <Map
           ref={mapRef}
           initialViewState={initialViewState}
-          style={{ width: '100%', height: '400px' }}
+          style={{ width: "100%", height: "400px" }}
           mapStyle="mapbox://styles/mapbox/streets-v12"
           mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
           reuseMaps
         >
           {/* Pickup Marker */}
-          <Marker longitude={ride.pickup_lng} latitude={ride.pickup_lat} anchor="bottom">
+          <Marker
+            longitude={ride.pickup_lng}
+            latitude={ride.pickup_lat}
+            anchor="bottom"
+          >
             <div className="w-3 h-3 bg-green-600 rounded-full animate-pulse"></div>
           </Marker>
 
           {/* Dropoff Marker */}
-          <Marker longitude={ride.dropoff_lng} latitude={ride.dropoff_lat} anchor="bottom">
+          <Marker
+            longitude={ride.dropoff_lng}
+            latitude={ride.dropoff_lat}
+            anchor="bottom"
+          >
             <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
           </Marker>
 
           {/* Driver Marker */}
           {driverLocation && (
-            <Marker longitude={driverLocation[1]} latitude={driverLocation[0]} anchor="bottom">
+            <Marker
+              longitude={driverLocation[1]}
+              latitude={driverLocation[0]}
+              anchor="bottom"
+            >
               <div className="text-2xl">🚗</div>
             </Marker>
           )}
@@ -217,7 +245,13 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
             <div>
               <svg width="0" height="0">
                 <defs>
-                  <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <linearGradient
+                    id="routeGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
                     <stop offset="0%" stopColor="blue" />
                     <stop offset="100%" stopColor="cyan" />
                   </linearGradient>
@@ -225,17 +259,24 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
               </svg>
               <svg
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
+                  width: "100%",
+                  height: "100%",
+                  pointerEvents: "none",
                   zIndex: 1,
                 }}
               >
                 <path
-                  d={`M ${route.map(([lng, lat]) => `${((lng - initialViewState.longitude) * 100000)} ${(lat - initialViewState.latitude) * -100000}`).join(' L ')}`}
+                  d={`M ${route
+                    .map(
+                      ([lng, lat]) =>
+                        `${(lng - initialViewState.longitude) * 100000} ${
+                          (lat - initialViewState.latitude) * -100000
+                        }`
+                    )
+                    .join(" L ")}`}
                   fill="none"
                   stroke="url(#routeGradient)"
                   strokeWidth="4"
@@ -270,11 +311,17 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
       {/* Driver Info */}
       {driver && (
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Driver Info</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            Driver Info
+          </h3>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="font-medium">{driver.user.name}</p>
-            <p className="text-gray-600">{driver.vehicle.make} {driver.vehicle.model}</p>
-            <p className="text-gray-600">License Plate: {driver.vehicle.plate_number}</p>
+            <p className="text-gray-600">
+              {driver.vehicle.make} {driver.vehicle.model}
+            </p>
+            <p className="text-gray-600">
+              License Plate: {driver.vehicle.plate_number}
+            </p>
             <div className="flex items-center mt-2">
               <span className="text-yellow-500 mr-1">★</span>
               <span>4.7</span>
@@ -290,7 +337,7 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
       </div>
 
       {/* Driver Controls */}
-      {user.role === 'driver' && (
+      {user.role === "driver" && (
         <div className="space-y-4 mb-6">
           <button
             onClick={handleStartRide}

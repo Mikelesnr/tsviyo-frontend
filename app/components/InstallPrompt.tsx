@@ -1,5 +1,6 @@
-'use client';
-import { useEffect, useState } from 'react';
+"use client";
+import { useEffect, useState } from "react";
+import { Download } from "lucide-react";
 
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -12,19 +13,19 @@ export default function InstallPrompt() {
       setShowButton(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener("beforeinstallprompt", handler);
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const choiceResult = await deferredPrompt.userChoice;
-    if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the A2HS prompt');
+    if (choiceResult.outcome === "accepted") {
+      console.log("User accepted the A2HS prompt");
     } else {
-      console.log('User dismissed the A2HS prompt');
+      console.log("User dismissed the A2HS prompt");
     }
     setDeferredPrompt(null);
     setShowButton(false);
@@ -36,8 +37,9 @@ export default function InstallPrompt() {
     <div className="fixed bottom-4 right-4 z-50">
       <button
         onClick={handleInstall}
-        className="bg-blue-600 text-white px-4 py-2 rounded shadow-lg"
+        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2"
       >
+        <Download size={18} />
         Install Tsviyo App
       </button>
     </div>
