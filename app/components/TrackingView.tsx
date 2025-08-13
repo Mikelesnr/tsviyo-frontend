@@ -184,8 +184,8 @@ export default function TrackingView({ user, setPage }: TrackingViewProps) {
   if (!user || !ride) {
     return (
       <div className="text-center py-16">
-        <p className="text-lg text-red-600">
-          Please log in and request a ride.
+        <p className="text-lg text-green-600">
+          Still Checking....
         </p>
       </div>
     );
