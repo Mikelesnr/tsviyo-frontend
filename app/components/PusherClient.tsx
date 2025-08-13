@@ -1,4 +1,3 @@
-// app/components/PusherClient.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -35,6 +34,7 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
   const [alertMessage, setAlertMessage] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -114,6 +114,7 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
 
         channel.bind("RideAccepted", (data: any) => {
           console.log("🎉 Rider: Ride accepted:", data);
+          localStorage.setItem("acceptedRide", JSON.stringify(data.ride));
           // Retrieve ride_id from localStorage once
           const storedRide = localStorage.getItem("currentRide");
           console.log("Stored Ride:", storedRide);
@@ -177,6 +178,8 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
 
   const handleAcceptRide = async () => {
     if (!selectedRide || !user) return;
+    if (isProcessing) return;
+    setIsProcessing(true);
 
     try {
       const response = await fetch(
@@ -214,9 +217,16 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
       setPage("tracking");
     } catch (error: any) {
       alert(`Error: ${error.message}`);
+      setIsProcessing(false);
     } finally {
       closeModal();
     }
+  };
+
+  const handleIgnore = () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    closeModal();
   };
 
   return (
@@ -269,22 +279,25 @@ export default function PusherClient({ user, setPage }: PusherClientProps) {
               {user?.role === "driver" && selectedRide ? (
                 <>
                   <button
-                    onClick={closeModal}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                    onClick={handleIgnore}
+                    disabled={isProcessing}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Ignore
+                    {isProcessing ? 'Processing...' : 'Ignore'}
                   </button>
                   <button
                     onClick={handleAcceptRide}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    disabled={isProcessing}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Accept Ride
+                    {isProcessing ? 'Processing...' : 'Accept Ride'}
                   </button>
                 </>
               ) : (
                 <button
                   onClick={closeModal}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  disabled={isProcessing}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   OK
                 </button>

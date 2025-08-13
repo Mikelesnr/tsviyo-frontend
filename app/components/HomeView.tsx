@@ -49,7 +49,7 @@ export default function HomeView({ user, setPage }: HomeViewProps) {
               ? "Go to Driver Onboarding Page"
               : "Request Your Ride"}
           </button>
-          {user.role === "rider" && <PastRides user={user} />}
+          {/* {user.role === "rider" && <PastRides user={user} />} */}
           {user?.role === 'admin' && (
             <button
               onClick={() => setPage('admin')}

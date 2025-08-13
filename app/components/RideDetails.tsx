@@ -29,12 +29,26 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
       const parsedRide = JSON.parse(savedRide);
       setRide(parsedRide);
 
-      if (parsedRide.status === 'accepted' && !sessionStorage.getItem('acceptance-alert-seen')) {
-        setShowAlert(true);
-        sessionStorage.setItem('acceptance-alert-seen', 'true');
+      // // Show alert if ride was just accepted
+      // if (parsedRide.status === 'accepted' && !sessionStorage.getItem('acceptance-alert-seen')) {
+      //   setShowAlert(true);
+      //   sessionStorage.setItem('acceptance-alert-seen', 'true');
+
+        // ✅ Auto-redirect after 5 seconds
+        const timer = setTimeout(() => {
+          setShowAlert(false);
+          setPage('tracking');
+        }, 5000);
+
+        return () => clearTimeout(timer);
+      // }
+
+      // If already accepted, go to tracking immediately
+      if (['accepted', 'en_route', 'arrived', 'in_progress'].includes(parsedRide.status?.toLowerCase())) {
+        setPage('tracking');
       }
     }
-  }, []);
+  }, [setPage]);
 
   if (!ride) {
     return <p className="text-center py-8">Loading ride details...</p>;
@@ -66,7 +80,6 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
       });
 
       if (!res.ok) throw new Error('Failed to cancel');
-
       localStorage.removeItem('currentRide');
       setPage('ride-request');
     } catch (err: any) {
@@ -84,7 +97,6 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
     }
 
     setLoading(true);
-
     if (!user || !user.token) {
       setError("Authentication error: User not logged in.");
       setLoading(false);
@@ -102,7 +114,6 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
       });
 
       if (!res.ok) throw new Error('Failed to cancel');
-
       localStorage.removeItem('currentRide');
       setPage('ride-request');
     } catch (err: any) {
@@ -129,10 +140,7 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
               </span>
             </div>
           ) : (
-            <p
-              className={`text-lg font-semibold ${isRideAccepted ? 'text-green-600' : 'text-blue-600'
-                }`}
-            >
+            <p className={`text-lg font-semibold ${isRideAccepted ? 'text-green-600' : 'text-blue-600'}`}>
               {ride.status
                 ?.split('_')
                 .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -222,15 +230,24 @@ export default function RideDetails({ setPage, user }: RideDetailsProps) {
       {/* ✅ Acceptance Alert Modal */}
       {showAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full text-center">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full text-center animate-in slide-in-from-bottom-4 duration-300">
             <div className="text-6xl mb-4">🎉</div>
             <h3 className="text-xl font-bold text-green-600 mb-2">Ride Accepted!</h3>
-            <p className="text-gray-700">A driver has accepted your ride. You can now track them.</p>
+            <p className="text-gray-700 mb-4">A driver has accepted your ride. Redirecting to tracking...</p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-green-600 h-2 rounded-full transition-all duration-100" 
+                style={{ width: '100%' }}
+              ></div>
+            </div>
             <button
-              onClick={() => setShowAlert(false)}
-              className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              onClick={() => {
+                setShowAlert(false);
+                setPage('tracking');
+              }}
+              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              Got it
+              Go to Tracking Now
             </button>
           </div>
         </div>
